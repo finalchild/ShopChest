@@ -1,5 +1,6 @@
 package de.epiceric.shopchest.config;
 
+import com.google.common.base.Charsets;
 import de.epiceric.shopchest.ShopChest;
 import de.epiceric.shopchest.language.LanguageUtils;
 import de.epiceric.shopchest.sql.Database;
@@ -8,11 +9,10 @@ import de.epiceric.shopchest.utils.ShopUpdater;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -413,85 +413,33 @@ public class Config {
     }
 
     private Reader getTextResource(String file, boolean showMessages) {
-        try {
-            return (Reader) plugin.getClass().getDeclaredMethod("getTextResource", String.class).invoke(plugin, file);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        final InputStream in = plugin.getResource(file);
+        if (in == null) {
             if (showMessages) plugin.getLogger().severe("Failed to get file from jar: " + file);
             plugin.debug("Failed to get file from jar: " + file);
-            plugin.debug(e);
+            return null;
         }
 
-        return null;
+        return new InputStreamReader(in, Charsets.UTF_8);
     }
 
     private void loadLanguageConfig(boolean showMessages) {
         langConfig = new LanguageConfiguration(plugin, showMessages);
-        File langFolder = new File(plugin.getDataFolder(), "lang");
+        Path langFolder = plugin.getDataFolder().toPath().resolve("lang");
 
-        if (!(new File(langFolder, "en_US.lang")).exists())
+        if (Files.notExists(langFolder.resolve("en_US.lang")))
             plugin.saveResource("lang/en_US.lang", false);
 
-        if (!(new File(langFolder, "de_DE.lang")).exists())
+        if (Files.notExists(langFolder.resolve("de_DE.lang")))
             plugin.saveResource("lang/de_DE.lang", false);
 
-        File langConfigFile = new File(langFolder, language_file + ".lang");
-        File langDefaultFile = new File(langFolder, "en_US.lang");
-
-        if (!langConfigFile.exists()) {
-            if (!langDefaultFile.exists()) {
-                try {
-                    Reader r = getTextResource("lang/" + langConfigFile.getName(), showMessages);
-
-                    if (r == null) {
-                        r = getTextResource("lang/en_US.lang", showMessages);
-                        if (showMessages) plugin.getLogger().info("Using locale \"en_US\" (Streamed from jar file)");
-                    } else {
-                        if (showMessages) plugin.getLogger().info("Using locale \"" + langConfigFile.getName().substring(0, langConfigFile.getName().length() - 5) + "\" (Streamed from jar file)");
-                    }
-
-                    if (r == null) {
-                        if (showMessages) plugin.getLogger().warning("Using default language values");
-                        plugin.debug("Using default language values (#1)");
-                    }
-
-                    BufferedReader br = new BufferedReader(r);
-
-                    StringBuilder sb = new StringBuilder();
-                    String line = br.readLine();
-
-                    while (line != null) {
-                        sb.append(line);
-                        sb.append("\n");
-                        line = br.readLine();
-                    }
-
-                    langConfig.loadFromString(sb.toString());
-                } catch (IOException | InvalidConfigurationException e) {
-                    if (showMessages) {
-                        plugin.getLogger().warning("Using default language values");
-                    }
-
-                    plugin.debug("Using default language values (#2)");
-                    plugin.debug(e);
-                }
-            } else {
-                try {
-                    langConfig.load(langDefaultFile);
-                    if (showMessages) plugin.getLogger().info("Using locale \"en_US\"");
-                } catch (IOException | InvalidConfigurationException e) {
-                    if (showMessages) {
-                        plugin.getLogger().warning("Using default language values");
-                    }
-
-                    plugin.debug("Using default language values (#3)");
-                    plugin.debug(e);
-                }
-            }
-        } else {
+        String localeToUse = language_file;
+        Path langConfigFile = langFolder.resolve(localeToUse + ".lang");
+        if (Files.exists(langConfigFile)) {
             try {
-                if (showMessages) plugin.getLogger().info("Using locale \"" + langConfigFile.getName().substring(0, langConfigFile.getName().length() - 5) + "\"");
+                if (showMessages) plugin.getLogger().info("Using locale \"" + localeToUse + "\"");
                 langConfig.load(langConfigFile);
-            } catch (IOException | InvalidConfigurationException e) {
+            } catch (IOException e) {
                 if (showMessages) {
                     plugin.getLogger().warning("Using default language values");
                 }
@@ -499,7 +447,60 @@ public class Config {
                 plugin.debug("Using default language values (#4)");
                 plugin.debug(e);
             }
+            return;
         }
+
+        localeToUse = "en_US";
+        langConfigFile = langFolder.resolve(localeToUse + ".lang");
+        if (Files.exists(langConfigFile)) {
+            try {
+                if (showMessages) plugin.getLogger().info("Using locale \"en_US\"");
+                langConfig.load(langConfigFile);
+            } catch (IOException e) {
+                if (showMessages) {
+                    plugin.getLogger().warning("Using default language values");
+                }
+
+                plugin.debug("Using default language values (#3)");
+                plugin.debug(e);
+            }
+            return;
+        }
+
+        localeToUse = language_file;
+        Reader r = getTextResource("lang/" + localeToUse + ".lang", showMessages);
+
+        if (r == null) {
+            localeToUse = "en_US";
+            r = getTextResource("lang/" + localeToUse + ".lang", showMessages);
+        }
+        if (r == null) {
+            localeToUse = null;
+        }
+
+        if (showMessages) {
+            if (localeToUse != null) {
+                plugin.getLogger().info("Using locale \"" + localeToUse + "\" (Streamed from jar file)");
+            } else {
+                plugin.getLogger().warning("Using default language values");
+            }
+        }
+
+        if (localeToUse != null) {
+            try {
+                langConfig.loadFromReader(r);
+            } catch (IOException e) {
+                if (showMessages) {
+                    plugin.getLogger().warning("Using default language values");
+                }
+
+                plugin.debug("Using default language values (#2)");
+                plugin.debug(e);
+            }
+            return;
+        }
+
+        plugin.debug("Using default language values (#1)");
     }
 
 }

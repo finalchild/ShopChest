@@ -5,6 +5,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,12 +20,12 @@ public class SQLite extends Database {
 
     @Override
     public Connection getConnection() {
-        File folder = plugin.getDataFolder();
-        File dbFile = new File(folder, "shops.db");
+        Path folder = plugin.getDataFolder().toPath();
+        Path dbFile = folder.resolve("shops.db");
 
-        if (!dbFile.exists()) {
+        if (Files.notExists(dbFile)) {
             try {
-                dbFile.createNewFile();
+                Files.createFile(dbFile);
             } catch (IOException ex) {
                 plugin.getLogger().severe("Failed to create database file");
                 plugin.debug("Failed to create database file");

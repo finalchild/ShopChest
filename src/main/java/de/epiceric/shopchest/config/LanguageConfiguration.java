@@ -1,18 +1,20 @@
 package de.epiceric.shopchest.config;
 
 import de.epiceric.shopchest.ShopChest;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
-public class LanguageConfiguration extends FileConfiguration {
+public class LanguageConfiguration {
 
-    private ArrayList<String> lines = new ArrayList<>();
-    private HashMap<String, String> values = new HashMap<>();
+    private Map<String, String> values = new HashMap<>();
 
     private ShopChest plugin;
     private boolean showMessages;
@@ -22,87 +24,47 @@ public class LanguageConfiguration extends FileConfiguration {
         this.showMessages = showMessages;
     }
 
-    @Override
-    public String saveToString() {
-        StringBuilder sb = new StringBuilder("");
-
-        for (String line : lines) {
-            sb.append(line);
-            sb.append("\n");
-        }
-
-        return sb.toString();
-    }
-
-    @Override
     public String getString(String path, String def) {
-        for (String key : values.keySet()) {
-            if (key.equals(path)) {
-                return values.get(key);
-            }
+        if (values.containsKey(path)) {
+            return values.get(path);
+        } else {
+            if (showMessages) plugin.getLogger().info("Could not find translation for \"" + path + "\" in selected language file. Using default translation (" + def + ")");
+            return def;
         }
 
-        if (showMessages) plugin.getLogger().info("Could not find translation for \"" + path + "\" in selected language file. Using default translation (" + def + ")");
-        return def;
     }
 
-    @Override
-    public void load(File file) throws IOException, InvalidConfigurationException {
-        FileInputStream fis = new FileInputStream(file);
-        InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(isr);
-
-        StringBuilder sb = new StringBuilder();
-
-        String line = br.readLine();
-        while (line != null) {
-            sb.append(line);
-            sb.append("\n");
-            line = br.readLine();
-        }
-
-        fis.close();
-        isr.close();
-        br.close();
-
-        loadFromString(sb.toString());
-    }
-
-    @Override
-    public void loadFromString(String s) throws InvalidConfigurationException {
-        String[] lines = s.split("\n");
-        for (String line : lines) {
-            if (!line.isEmpty()) {
-                this.lines.add(line);
-
-                if (!line.startsWith("#")) {
-                    if (line.contains("=")) {
-                        if (line.split("=").length >= 2) {
-                            String key = line.split("=")[0];
-                            StringBuilder sbValue = new StringBuilder();
-
-                            for (int i = 1; i < line.split("=").length; i++) {
-                                if (i > 1) {
-                                    sbValue.append("=");
-                                }
-                                sbValue.append(line.split("=")[i]);
-                            }
-
-                            String value = sbValue.toString();
-
-                            values.put(key, value);
-                        } else if (line.split("=").length == 1) {
-                            String key = line.split("=")[0];
-                            values.put(key, "");
-                        }
-                    }
-                }
-            }
+    public void load(Path file) throws IOException {
+        try (BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            loadFromBufferedReader(br);
         }
     }
 
-    @Override
-    protected String buildHeader() {
-        return null;
+    public void loadFromReader(Reader r) throws IOException {
+        try (BufferedReader br = new BufferedReader(r)) {
+            loadFromBufferedReader(br);
+        }
+
     }
+
+    public void loadFromBufferedReader(BufferedReader br) {
+        br.lines().forEachOrdered(this::loadLine);
+    }
+
+    public void loadFromString(String s) {
+        Arrays.stream(s.split("\n")).forEach(this::loadLine);
+    }
+
+    private void loadLine(String line) {
+        if (line.isEmpty() || line.charAt(0) == '#') {
+            return;
+        }
+
+        int index = line.indexOf('=');
+        if (index == -1) {
+            return;
+        }
+        values.put(line.substring(0, index), line.substring(index + 1));
+    }
+
 }

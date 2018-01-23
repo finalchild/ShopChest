@@ -48,10 +48,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import pl.islandworld.IslandWorld;
 import us.talabrek.ultimateskyblock.api.uSkyBlockAPI;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class ShopChest extends JavaPlugin {
     private String latestVersion = "";
     private String downloadLink = "";
     private ShopUtils shopUtils;
-    private FileWriter fw;
+    private BufferedWriter bw;
     private WorldGuardPlugin worldGuard;
     private Towny towny;
     private AuthMe authMe;
@@ -108,18 +109,12 @@ public class ShopChest extends JavaPlugin {
         config = new Config(this);
 
         if (config.enable_debug_log) {
-            File debugLogFile = new File(getDataFolder(), "debug.txt");
+            Path debugLogFile = getDataFolder().toPath().resolve("debug.txt");
 
             try {
-                if (!debugLogFile.exists()) {
-                    debugLogFile.createNewFile();
-                }
-
-                new PrintWriter(debugLogFile).close();
-
-                fw = new FileWriter(debugLogFile, true);
+                bw = Files.newBufferedWriter(debugLogFile, StandardCharsets.UTF_8);
             } catch (IOException e) {
-                getLogger().info("Failed to instantiate FileWriter");
+                getLogger().info("Failed to instantiate BufferedWriter");
                 e.printStackTrace();
             }
         }
@@ -217,9 +212,9 @@ public class ShopChest extends JavaPlugin {
             database.disconnect();
         }
 
-        if (fw != null && config.enable_debug_log) {
+        if (bw != null && config.enable_debug_log) {
             try {
-                fw.close();
+                bw.close();
             } catch (IOException e) {
                 getLogger().severe("Failed to close FileWriter");
                 e.printStackTrace();
@@ -404,12 +399,12 @@ public class ShopChest extends JavaPlugin {
      * @param message Message to print
      */
     public void debug(String message) {
-        if (config.enable_debug_log && fw != null) {
+        if (config.enable_debug_log && bw != null) {
             try {
                 Calendar c = Calendar.getInstance();
                 String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(c.getTime());
-                fw.write(String.format("[%s] %s\r\n", timestamp, message));
-                fw.flush();
+                bw.write(String.format("[%s] %s\r\n", timestamp, message));
+                bw.flush();
             } catch (IOException e) {
                 getLogger().severe("Failed to print debug message.");
                 e.printStackTrace();
@@ -422,8 +417,8 @@ public class ShopChest extends JavaPlugin {
      * @param throwable {@link Throwable} whose stacktrace will be printed
      */
     public void debug(Throwable throwable) {
-        if (config.enable_debug_log && fw != null) {
-            PrintWriter pw = new PrintWriter(fw);
+        if (config.enable_debug_log && bw != null) {
+            PrintWriter pw = new PrintWriter(bw);
             throwable.printStackTrace(pw);
             pw.flush();
         }

@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -30,12 +30,12 @@ public class HologramFormat {
     private static final Pattern SIMPLE_STRING_CONDITION = Pattern.compile("^\"([^\"]*)\" ([=!]=) \"([^\"]*)\"$");
 
     private ShopChest plugin;
-    private File configFile;
+    private Path configFile;
     private YamlConfiguration config;
 
     public HologramFormat(ShopChest plugin) {
-        this.configFile = new File(plugin.getDataFolder(), "hologram-format.yml");
-        this.config = YamlConfiguration.loadConfiguration(configFile);
+        this.configFile = plugin.getDataFolder().toPath().resolve("hologram-format.yml");
+        this.config = YamlConfiguration.loadConfiguration(configFile.toFile());
         this.plugin = plugin;
     }
 
@@ -73,7 +73,7 @@ public class HologramFormat {
     }
 
     public void reload() {
-        config = YamlConfiguration.loadConfiguration(configFile);
+        config = YamlConfiguration.loadConfiguration(configFile.toFile());
     }
 
     /** Returns whether the hologram text has to change dynamically without reloading */
