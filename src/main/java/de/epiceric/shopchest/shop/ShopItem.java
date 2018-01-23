@@ -73,7 +73,7 @@ public class ShopItem {
 
             entityItemClass.getMethod("setPosition", double.class, double.class, double.class).invoke(tmpEntityItem, location.getX(), location.getY(), location.getZ());
             entityItemClass.getMethod("setItemStack", nmsItemStackClass).invoke(tmpEntityItem, nmsItemStack);
-            if (Utils.getMajorVersion() >= 10) entityItemClass.getMethod("setNoGravity", boolean.class).invoke(tmpEntityItem, true);
+            entityItemClass.getMethod("setNoGravity", boolean.class).invoke(tmpEntityItem, true);
 
             Field ageField = entityItemClass.getDeclaredField("age");
             ageField.setAccessible(true);

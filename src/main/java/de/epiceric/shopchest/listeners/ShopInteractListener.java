@@ -337,9 +337,7 @@ public class ShopInteractListener implements Listener {
         Player p = e.getPlayer();
         boolean inverted = config.invert_mouse_buttons;
 
-        if (Utils.getMajorVersion() >= 9) {
-            if (e.getHand() == EquipmentSlot.OFF_HAND) return;
-        }
+        if (e.getHand() == EquipmentSlot.OFF_HAND) return;
 
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_BLOCK) {
             if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST)) {
@@ -528,7 +526,7 @@ public class ShopInteractListener implements Listener {
                                                         if (shop.getVendor().isOnline() && config.enable_vendor_messages) {
                                                             shop.getVendor().getPlayer().sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.VENDOR_OUT_OF_STOCK,
                                                                     new LocalizedMessage.ReplacedPlaceholder(Placeholder.AMOUNT, String.valueOf(shop.getProduct().getAmount())),
-                                                                            new LocalizedMessage.ReplacedPlaceholder(Placeholder.ITEM_NAME, LanguageUtils.getItemName(shop.getProduct()))));
+                                                                    new LocalizedMessage.ReplacedPlaceholder(Placeholder.ITEM_NAME, LanguageUtils.getItemName(shop.getProduct()))));
                                                         }
                                                         plugin.debug("Shop is out of stock");
                                                     }
@@ -655,7 +653,7 @@ public class ShopInteractListener implements Listener {
         Player p = e.getPlayer();
         if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMeApi.getInstance().isAuthenticated(p)) return;
 
-        if (Utils.getMajorVersion() == 8 || e.getHand() == EquipmentSlot.HAND) {
+        if (e.getHand() == EquipmentSlot.HAND) {
             if (entity instanceof ArmorStand) {
                 ArmorStand armorStand = (ArmorStand) entity;
                 if (Hologram.isPartOfHologram(armorStand)) {
@@ -867,15 +865,10 @@ public class ShopInteractListener implements Listener {
             BookMeta meta = (BookMeta) shop.getProduct().getItemMeta();
             CustomBookMeta.Generation generation = CustomBookMeta.Generation.TATTERED;
 
-            if ((Utils.getMajorVersion() == 9 && Utils.getRevision() == 1) || Utils.getMajorVersion() == 8) {
-                CustomBookMeta.Generation gen = CustomBookMeta.getGeneration(shop.getProduct());
-                generation = (gen == null ? CustomBookMeta.Generation.ORIGINAL : gen);
-            } else if (Utils.getMajorVersion() >= 10) {
-                if (meta.hasGeneration()) {
-                    generation = CustomBookMeta.Generation.valueOf(meta.getGeneration().toString());
-                } else {
-                    generation = CustomBookMeta.Generation.ORIGINAL;
-                }
+            if (meta.hasGeneration()) {
+                generation = CustomBookMeta.Generation.valueOf(meta.getGeneration().toString());
+            } else {
+                generation = CustomBookMeta.Generation.ORIGINAL;
             }
 
             bookGenerationString = LanguageUtils.getMessage(LocalizedMessage.Message.SHOP_INFO_BOOK_GENERATION,
@@ -1249,9 +1242,7 @@ public class ShopInteractListener implements Listener {
         int added = 0;
 
         if (inventory instanceof PlayerInventory) {
-            if (Utils.getMajorVersion() >= 9) {
-                inventoryItems.put(40, inventory.getItem(40));
-            }
+            inventoryItems.put(40, inventory.getItem(40));
 
             for (int i = 0; i < 36; i++) {
                 inventoryItems.put(i, inventory.getItem(i));
@@ -1307,9 +1298,7 @@ public class ShopInteractListener implements Listener {
         int removed = 0;
 
         if (inventory instanceof PlayerInventory) {
-            if (Utils.getMajorVersion() >= 9) {
-                inventoryItems.put(40, inventory.getItem(40));
-            }
+            inventoryItems.put(40, inventory.getItem(40));
 
             for (int i = 0; i < 36; i++) {
                 inventoryItems.put(i, inventory.getItem(i));

@@ -21,6 +21,10 @@ repositories {
         url 'http://nexus.hc.to/content/repositories/pub_releases/'
     }
     maven {
+        name 'LanguageUtils Repository'
+        url 'https://raw.github.com/MascusJeoraly/LanguageUtils/mvn-repo/'
+    }
+    maven {
         name 'bStats Repository'
         url 'https://repo.bstats.org/content/repositories/releases/'
     }
@@ -57,6 +61,7 @@ repositories {
 dependencies {
     compile group: 'org.bukkit', name: 'bukkit', version: '1.12.2-R0.1-SNAPSHOT'
     compile group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.6'
+    compile group: 'com.meowj', name: 'LangUtils', version: '1.9'
     compile group: 'org.bstats', name: 'bstats-bukkit', version: '1.2'
     compileOnly group: 'fr.xephi', name: 'authme', version: '5.4.0'
     compileOnly group: 'com.plotsquared', name: 'plotsquared-api', version: 'latest'

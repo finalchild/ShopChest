@@ -32,7 +32,6 @@ import de.epiceric.shopchest.utils.ShopUpdater;
 import de.epiceric.shopchest.utils.ShopUtils;
 import de.epiceric.shopchest.utils.UpdateChecker;
 import de.epiceric.shopchest.utils.UpdateChecker.UpdateCheckerResult;
-import de.epiceric.shopchest.utils.Utils;
 import fr.xephi.authme.AuthMe;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.wiefferink.areashop.AreaShop;
@@ -52,7 +51,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -146,23 +144,6 @@ public class ShopChest extends JavaPlugin {
             return;
         }
 
-        switch (Utils.getServerVersion()) {
-            case "v1_8_R1":
-            case "v1_8_R2":
-            case "v1_8_R3":
-            case "v1_9_R1":
-            case "v1_9_R2":
-            case "v1_10_R1":
-            case "v1_11_R1":
-            case "v1_12_R1":
-                break;
-            default:
-                debug("Server version not officially supported: " + Utils.getServerVersion() + "!");
-                debug("Plugin may still work, but more errors are expected!");
-                getLogger().warning("Server version not officially supported: " + Utils.getServerVersion() + "!");
-                getLogger().warning("Plugin may still work, but more errors are expected!");
-        }
-
         loadExternalPlugins();
 
         debug("Loading utils and extras...");
@@ -170,8 +151,8 @@ public class ShopChest extends JavaPlugin {
 
         saveResource("item_names.txt", true);
 
-        File hologramFormatFile = new File(getDataFolder(), "hologram-format.yml");
-        if (!hologramFormatFile.exists()) {
+        Path hologramFormatFile = getDataFolder().toPath().resolve("hologram-format.yml");
+        if (Files.notExists(hologramFormatFile)) {
             saveResource("hologram-format.yml", false);
         }
 
@@ -365,10 +346,7 @@ public class ShopChest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ShopInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new NotifyPlayerOnJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new ChestProtectListener(this, worldGuard), this);
-
-        if (!Utils.getServerVersion().equals("v1_8_R1")) {
-            getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
-        }
+        getServer().getPluginManager().registerEvents(new BlockExplodeListener(this), this);
 
         if (hasWorldGuard()) {
             getServer().getPluginManager().registerEvents(new WorldGuardListener(this), this);

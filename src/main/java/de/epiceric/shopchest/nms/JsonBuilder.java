@@ -22,14 +22,10 @@ public class JsonBuilder {
     public JsonBuilder(ShopChest plugin, String text, String hoverText, String downloadLink) {
         this.plugin = plugin;
 
-        if (Utils.getServerVersion().equals("v1_8_R1")) {
-            chatSerializerClass = Utils.getNMSClass("ChatSerializer");
-        } else {
-            chatSerializerClass = Utils.getNMSClass("IChatBaseComponent$ChatSerializer");
-        }
+        chatSerializerClass = Utils.getNMSClass("IChatBaseComponent$ChatSerializer");
 
         Class[] requiredClasses = new Class[] {
-          iChatBaseComponentClass, packetPlayOutChatClass, chatSerializerClass
+                iChatBaseComponentClass, packetPlayOutChatClass, chatSerializerClass
         };
 
         for (Class c : requiredClasses) {

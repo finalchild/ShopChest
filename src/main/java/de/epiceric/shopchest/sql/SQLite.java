@@ -3,7 +3,6 @@ package de.epiceric.shopchest.sql;
 import de.epiceric.shopchest.ShopChest;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

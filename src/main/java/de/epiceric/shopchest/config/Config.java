@@ -6,11 +6,9 @@ import de.epiceric.shopchest.language.LanguageUtils;
 import de.epiceric.shopchest.sql.Database;
 import de.epiceric.shopchest.utils.ItemUtils;
 import de.epiceric.shopchest.utils.ShopUpdater;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -229,7 +227,7 @@ public class Config {
      * @param value Value to set
      */
     public void set(String property, String value) {
-        boolean langChange = (property.equalsIgnoreCase("language-file"));
+        boolean langChange = property.equalsIgnoreCase("language-file");
         try {
             int intValue = Integer.parseInt(value);
             plugin.getConfig().set(property, intValue);

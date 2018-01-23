@@ -4,7 +4,6 @@ import com.intellectualcrafters.plot.flag.Flag;
 import com.intellectualcrafters.plot.object.Plot;
 import de.epiceric.shopchest.ShopChest;
 import de.epiceric.shopchest.external.PlotSquaredShopFlag;
-import de.epiceric.shopchest.nms.CustomBookMeta;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -43,17 +42,8 @@ public class Utils {
             BookMeta bookMeta1 = (BookMeta) itemStack1.getItemMeta();
             BookMeta bookMeta2 = (BookMeta) itemStack2.getItemMeta();
 
-            if ((getMajorVersion() == 9 && getRevision() == 1) || getMajorVersion() == 8) {
-                CustomBookMeta.Generation generation1 = CustomBookMeta.getGeneration(itemStack1);
-                CustomBookMeta.Generation generation2 = CustomBookMeta.getGeneration(itemStack2);
-
-                if (generation1 == null) CustomBookMeta.setGeneration(itemStack1, CustomBookMeta.Generation.ORIGINAL);
-                if (generation2 == null) CustomBookMeta.setGeneration(itemStack2, CustomBookMeta.Generation.ORIGINAL);
-
-            } else if (getMajorVersion() >= 10) {
-                if (bookMeta1.getGeneration() == null) bookMeta1.setGeneration(BookMeta.Generation.ORIGINAL);
-                if (bookMeta2.getGeneration() == null) bookMeta2.setGeneration(BookMeta.Generation.ORIGINAL);
-            }
+            if (bookMeta1.getGeneration() == null) bookMeta1.setGeneration(BookMeta.Generation.ORIGINAL);
+            if (bookMeta2.getGeneration() == null) bookMeta2.setGeneration(BookMeta.Generation.ORIGINAL);
 
             itemStack1.setItemMeta(bookMeta1);
             itemStack2.setItemMeta(bookMeta2);
@@ -75,9 +65,7 @@ public class Utils {
         ArrayList<ItemStack> inventoryItems = new ArrayList<>();
 
         if (inventory instanceof PlayerInventory) {
-            if (getMajorVersion() >= 9) {
-                inventoryItems.add(inventory.getItem(40));
-            }
+            inventoryItems.add(inventory.getItem(40));
 
             for (int i = 0; i < 36; i++) {
                 inventoryItems.add(inventory.getItem(i));
@@ -122,16 +110,14 @@ public class Utils {
                 }
             }
 
-            if (getMajorVersion() >= 9) {
-                ItemStack item = inventory.getItem(40);
-                if (item == null || item.getType() == Material.AIR) {
-                    slotFree.put(40, itemStack.getMaxStackSize());
-                } else {
-                    if (isItemSimilar(item, itemStack)) {
-                        int amountInSlot = item.getAmount();
-                        int amountToFullStack = itemStack.getMaxStackSize() - amountInSlot;
-                        slotFree.put(40, amountToFullStack);
-                    }
+            ItemStack item = inventory.getItem(40);
+            if (item == null || item.getType() == Material.AIR) {
+                slotFree.put(40, itemStack.getMaxStackSize());
+            } else {
+                if (isItemSimilar(item, itemStack)) {
+                    int amountInSlot = item.getAmount();
+                    int amountToFullStack = itemStack.getMaxStackSize() - amountInSlot;
+                    slotFree.put(40, amountToFullStack);
                 }
             }
         } else {
@@ -162,17 +148,10 @@ public class Utils {
      * @return {@link ItemStack} in his main hand, or {@code null} if he doesn't hold one
      */
     public static ItemStack getItemInMainHand(Player p) {
-        if (getMajorVersion() < 9) {
-            if (p.getItemInHand().getType() == Material.AIR)
-                return null;
-            else
-                return p.getItemInHand();
-        } else {
-            if (p.getInventory().getItemInMainHand().getType() == Material.AIR)
-                return null;
-            else
-                return p.getInventory().getItemInMainHand();
-        }
+        if (p.getInventory().getItemInMainHand().getType() == Material.AIR)
+            return null;
+        else
+            return p.getInventory().getItemInMainHand();
     }
 
     /**
@@ -180,14 +159,10 @@ public class Utils {
      * @return {@link ItemStack} in his off hand, or {@code null} if he doesn't hold one or the server version is below 1.9
      */
     public static ItemStack getItemInOffHand(Player p) {
-        if (getMajorVersion() < 9) {
+        if (p.getInventory().getItemInOffHand().getType() == Material.AIR)
             return null;
-        } else {
-            if (p.getInventory().getItemInOffHand().getType() == Material.AIR)
-                return null;
-            else
-                return p.getInventory().getItemInOffHand();
-        }
+        else
+            return p.getInventory().getItemInOffHand();
     }
 
     /**
@@ -196,14 +171,10 @@ public class Utils {
      *         if he doesn't have one in both hands
      */
     public static ItemStack getPreferredItemInHand(Player p) {
-        if (getMajorVersion() < 9) {
+        if (getItemInMainHand(p) != null)
             return getItemInMainHand(p);
-        } else {
-            if (getItemInMainHand(p) != null)
-                return getItemInMainHand(p);
-            else
-                return getItemInOffHand(p);
-        }
+        else
+            return getItemInOffHand(p);
     }
 
     /**
@@ -370,20 +341,6 @@ public class Utils {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
 
         return packageName.substring(packageName.lastIndexOf('.') + 1);
-    }
-
-    /**
-     * @return The revision of the current server version (e.g. <i>2</i> for v1_9_R2, <i>1</i> for v1_10_R1)
-     */
-    public static int getRevision() {
-        return Integer.parseInt(getServerVersion().substring(getServerVersion().length() - 1));
-    }
-
-    /**
-     * @return The major version of the server (e.g. <i>9</i> for 1.9.2, <i>10</i> for 1.10)
-     */
-    public static int getMajorVersion() {
-        return Integer.parseInt(getServerVersion().split("_")[1]);
     }
 
     /**
