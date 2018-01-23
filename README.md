@@ -25,11 +25,11 @@ To use the API, you need to add the following repository and dependency in your 
 You can find the javadoc here: https://epicericee.github.io/ShopChest/javadoc/
 
 ## Build
-Clone this repository and use ``mvn clean package`` or ``mvn clean install``.
-After the build succeeded, the ShopChest.jar is found in the ``/target/`` folder.
+Clone this repository and use ``./gradlew``.
+After the build succeeded, the ShopChest.jar is found in the ``/build/lib/`` folder.
 
 ## Issues
-If you find any issues, please provide them in the [Issues Section](https://github.com/EpicEricEE/ShopChest/issues) with a good description of how to reproduce it. If you get any error messages in the console, please also provide them.
+If you find any issues, please provide them in the [Issues Section](https://github.com/finalchild/ShopChest/issues) with a good description of how to reproduce it. If you get any error messages in the console, please also provide them.
 
 
 ## Download

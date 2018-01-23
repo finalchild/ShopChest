@@ -266,17 +266,11 @@ public class Utils {
      * @return Whether the player is allowed
      */
     public static boolean hasPermissionToCreateShop(Player player, ItemStack item, boolean buy, boolean sell) {
-        if (hasPermissionToCreateShop(player, item, Permissions.CREATE)) {
-            return true;
-        } else if (!sell && buy && hasPermissionToCreateShop(player, item,Permissions.CREATE_BUY)) {
-            return true;
-        } else if (!buy && sell && hasPermissionToCreateShop(player, item, Permissions.CREATE_SELL)) {
-            return true;
-        } else if (buy && sell && hasPermissionToCreateShop(player, item, Permissions.CREATE_BUY, Permissions.CREATE_SELL)) {
-            return true;
-        }
+        return hasPermissionToCreateShop(player, item, Permissions.CREATE)
+                || !sell && buy && hasPermissionToCreateShop(player, item, Permissions.CREATE_BUY)
+                || !buy && sell && hasPermissionToCreateShop(player, item, Permissions.CREATE_SELL)
+                || buy && sell && hasPermissionToCreateShop(player, item, Permissions.CREATE_BUY, Permissions.CREATE_SELL);
 
-        return false;
     }
 
     private static boolean hasPermissionToCreateShop(Player player, ItemStack item, String... permissions) {

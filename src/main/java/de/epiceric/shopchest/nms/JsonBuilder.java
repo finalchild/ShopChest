@@ -43,7 +43,7 @@ public class JsonBuilder {
     }
 
     private JsonBuilder parse(String text, String hoverText, String downloadLink) {
-        String regex = "[&§]{1}([a-fA-Fl-oL-O0-9]){1}";
+        String regex = "[&§]([a-fA-Fl-oL-O0-9])";
         text = text.replaceAll(regex, "§$1");
         if (!Pattern.compile(regex).matcher(text).find()) {
             withText(text).withHoverEvent(hoverText).withClickEvent(downloadLink);
@@ -56,7 +56,7 @@ public class JsonBuilder {
             try {
                 if (index != words[0].length())
                     withText(word).withColor("§" + text.charAt(index - 1)).withHoverEvent(hoverText).withClickEvent(downloadLink);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
             index += word.length() + 2;
         }
         return this;
@@ -101,12 +101,12 @@ public class JsonBuilder {
 
     public String toString() {
         if (extras.size() <= 1) return extras.size() == 0 ? "{\"text\":\"\"}" : extras.get(0);
-        String text = extras.get(0).substring(0, extras.get(0).length() - 1) + ",\"extra\":[";
+        StringBuilder text = new StringBuilder(extras.get(0).substring(0, extras.get(0).length() - 1) + ",\"extra\":[");
         extras.remove(0);
         for (String extra : extras)
-            text = text + extra + ",";
-        text = text.substring(0, text.length() - 1) + "]}";
-        return text;
+            text.append(extra).append(",");
+        text = new StringBuilder(text.substring(0, text.length() - 1) + "]}");
+        return text.toString();
     }
 
     public void sendJson(Player p) {

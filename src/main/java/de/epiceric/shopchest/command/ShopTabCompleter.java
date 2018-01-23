@@ -31,76 +31,81 @@ class ShopTabCompleter implements TabCompleter {
 
             ArrayList<String> returnCompletions = new ArrayList<>();
 
-            if (args.length == 2) {
-                if (args[0].equals("config")) {
-                    if (!args[1].equals("")) {
-                        for (String s : configSubCommands) {
-                            if (s.startsWith(args[1])) {
-                                returnCompletions.add(s);
-                            }
-                        }
-
-                        return returnCompletions;
-                    } else {
-                        return configSubCommands;
-                    }
-                }
-            } else if (args.length == 3) {
-                if (args[0].equals("config")) {
-                    if (!args[2].equals("")) {
-                        for (String s : configValues) {
-                            if (s.startsWith(args[2])) {
-                                returnCompletions.add(s);
-                            }
-                        }
-
-                        return returnCompletions;
-                    } else {
-                        return new ArrayList<>(configValues);
-                    }
-                }
-            } else if (args.length == 4) {
-                if (args[0].equals("config")) {
-                    if (args[2].equals("towny-shop-plots")) {
-                        if (!args[3].equals("")) {
-                            for (String s : townyShopPlots) {
-                                if (s.startsWith(args[3])) {
+            switch (args.length) {
+                case 2:
+                    if (args[0].equals("config")) {
+                        if (!args[1].equals("")) {
+                            for (String s : configSubCommands) {
+                                if (s.startsWith(args[1])) {
                                     returnCompletions.add(s);
                                 }
                             }
 
                             return returnCompletions;
                         } else {
-                            return townyShopPlots;
+                            return configSubCommands;
                         }
-                    } else if (args[2].equals("areashop-remove-shops")) {
-                        if (!args[3].equals("")) {
-                            for (String s : areaShopRemoveEvents) {
-                                if (s.startsWith(args[3])) {
+                    }
+                    break;
+                case 3:
+                    if (args[0].equals("config")) {
+                        if (!args[2].equals("")) {
+                            for (String s : configValues) {
+                                if (s.startsWith(args[2])) {
                                     returnCompletions.add(s);
                                 }
                             }
 
                             return returnCompletions;
                         } else {
-                            return areaShopRemoveEvents;
+                            return new ArrayList<>(configValues);
                         }
                     }
-                }
-            } else if (args.length == 5) {
-                if (args[0].equals("create")) {
-                    if (!args[4].equals("")) {
-                        for (String s : createSubCommands) {
-                            if (s.startsWith(args[4])) {
-                                returnCompletions.add(s);
+                    break;
+                case 4:
+                    if (args[0].equals("config")) {
+                        if (args[2].equals("towny-shop-plots")) {
+                            if (!args[3].equals("")) {
+                                for (String s : townyShopPlots) {
+                                    if (s.startsWith(args[3])) {
+                                        returnCompletions.add(s);
+                                    }
+                                }
+
+                                return returnCompletions;
+                            } else {
+                                return townyShopPlots;
+                            }
+                        } else if (args[2].equals("areashop-remove-shops")) {
+                            if (!args[3].equals("")) {
+                                for (String s : areaShopRemoveEvents) {
+                                    if (s.startsWith(args[3])) {
+                                        returnCompletions.add(s);
+                                    }
+                                }
+
+                                return returnCompletions;
+                            } else {
+                                return areaShopRemoveEvents;
                             }
                         }
-
-                        return returnCompletions;
-                    } else {
-                        return createSubCommands;
                     }
-                }
+                    break;
+                case 5:
+                    if (args[0].equals("create")) {
+                        if (!args[4].equals("")) {
+                            for (String s : createSubCommands) {
+                                if (s.startsWith(args[4])) {
+                                    returnCompletions.add(s);
+                                }
+                            }
+
+                            return returnCompletions;
+                        } else {
+                            return createSubCommands;
+                        }
+                    }
+                    break;
             }
         }
 

@@ -133,62 +133,63 @@ public class HologramFormat {
             }
         }
 
-        if (cond.equals("true")) {
-            // e.g.: ADMIN_SHOP
-            return true;
-        } else if (cond.equals("false")) {
-            return false;
-        } else {
-            char firstChar = cond.charAt(0);
-
-            // numeric cond: first char must be a digit (no variable can be negative)
-            if (firstChar >= '0' && firstChar <= '9') {
-                Matcher matcher = SIMPLE_NUMERIC_CONDITION.matcher(cond);
-
-                if (matcher.find()) {
-                    Double a, b;
-                    Operator operator;
-                    try {
-                        a = Double.valueOf(matcher.group(1));
-                        operator = Operator.from(matcher.group(2));
-                        b = Double.valueOf(matcher.group(3));
-
-                        return operator.compare(a, b);
-                    } catch (IllegalArgumentException ignored) {
-                        // should not happen, since regex checked that there is valid number and valid operator
-                    }
-                }
-            }
-
-            // string cond: first char must be a: "
-            if (firstChar == '"') {
-                Matcher matcher = SIMPLE_STRING_CONDITION.matcher(cond);
-
-                if (matcher.find()) {
-                    String a, b;
-                    Operator operator;
-                    try {
-                        a = matcher.group(1);
-                        operator = Operator.from(matcher.group(2));
-                        b = matcher.group(3);
-
-                        return operator.compare(a, b);
-                    } catch (IllegalArgumentException | UnsupportedOperationException ignored) {
-                        // should not happen, since regex checked that there is valid operator
-                    }
-                }
-            }
-
-            // complex comparison
-            try {
-                ScriptEngineManager manager = new ScriptEngineManager();
-                ScriptEngine engine = manager.getEngineByName("JavaScript");
-                return (boolean) engine.eval(cond);
-            } catch (ScriptException e) {
-                plugin.debug("Failed to eval condition: " + condition);
-                plugin.debug(e);
+        switch (cond) {
+            case "true":
+                // e.g.: ADMIN_SHOP
+                return true;
+            case "false":
                 return false;
-            }
+            default:
+                char firstChar = cond.charAt(0);
+
+                // numeric cond: first char must be a digit (no variable can be negative)
+                if (firstChar >= '0' && firstChar <= '9') {
+                    Matcher matcher = SIMPLE_NUMERIC_CONDITION.matcher(cond);
+
+                    if (matcher.find()) {
+                        Double a, b;
+                        Operator operator;
+                        try {
+                            a = Double.valueOf(matcher.group(1));
+                            operator = Operator.from(matcher.group(2));
+                            b = Double.valueOf(matcher.group(3));
+
+                            return operator.compare(a, b);
+                        } catch (IllegalArgumentException ignored) {
+                            // should not happen, since regex checked that there is valid number and valid operator
+                        }
+                    }
+                }
+
+                // string cond: first char must be a: "
+                if (firstChar == '"') {
+                    Matcher matcher = SIMPLE_STRING_CONDITION.matcher(cond);
+
+                    if (matcher.find()) {
+                        String a, b;
+                        Operator operator;
+                        try {
+                            a = matcher.group(1);
+                            operator = Operator.from(matcher.group(2));
+                            b = matcher.group(3);
+
+                            return operator.compare(a, b);
+                        } catch (IllegalArgumentException | UnsupportedOperationException ignored) {
+                            // should not happen, since regex checked that there is valid operator
+                        }
+                    }
+                }
+
+                // complex comparison
+                try {
+                    ScriptEngineManager manager = new ScriptEngineManager();
+                    ScriptEngine engine = manager.getEngineByName("JavaScript");
+                    return (boolean) engine.eval(cond);
+                } catch (ScriptException e) {
+                    plugin.debug("Failed to eval condition: " + condition);
+                    plugin.debug(e);
+                    return false;
+                }
         }
     }
 

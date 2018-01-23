@@ -37,7 +37,7 @@ import fr.xephi.authme.AuthMe;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.wiefferink.areashop.AreaShop;
 import net.milkbowl.vault.economy.Economy;
-import org.bstats.Metrics;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -55,6 +55,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ShopChest extends JavaPlugin {
 
@@ -286,30 +287,23 @@ public class ShopChest extends JavaPlugin {
         debug("Initializing Metrics...");
         Metrics metrics = new Metrics(this);
 
-        metrics.addCustomChart(new Metrics.AdvancedPie("shop_type") {
-            @Override
-            public HashMap<String, Integer> getValues(HashMap<String, Integer> hashMap) {
-                int normal = 0;
-                int admin = 0;
+        metrics.addCustomChart(new Metrics.AdvancedPie("shop_type", () -> {
+            int normal = 0;
+            int admin = 0;
 
-                for (Shop shop : shopUtils.getShops()) {
-                    if (shop.getShopType() == ShopType.NORMAL) normal++;
-                    else if (shop.getShopType() == ShopType.ADMIN) admin++;
-                }
-
-                hashMap.put("Admin", admin);
-                hashMap.put("Normal", normal);
-
-                return hashMap;
+            for (Shop shop : shopUtils.getShops()) {
+                if (shop.getShopType() == ShopType.NORMAL) normal++;
+                else if (shop.getShopType() == ShopType.ADMIN) admin++;
             }
-        });
 
-        metrics.addCustomChart(new Metrics.SimplePie("database_type") {
-            @Override
-            public String getValue() {
-                return config.database_type.toString();
-            }
-        });
+            Map<String, Integer> hashMap = new HashMap<>();
+            hashMap.put("Admin", admin);
+            hashMap.put("Normal", normal);
+
+            return hashMap;
+        }));
+
+        metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> config.database_type.toString()));
 
         if (config.database_type == Database.DatabaseType.SQLite) {
             debug("Using database type: SQLite");
@@ -320,12 +314,9 @@ public class ShopChest extends JavaPlugin {
             getLogger().info("Using MySQL");
             database = new MySQL(this);
             if (config.database_mysql_ping_interval > 0) {
-                Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (database instanceof MySQL) {
-                            ((MySQL) database).ping();
-                        }
+                Bukkit.getScheduler().runTaskTimer(this, () -> {
+                    if (database instanceof MySQL) {
+                        ((MySQL) database).ping();
                     }
                 }, config.database_mysql_ping_interval * 20L, config.database_mysql_ping_interval * 20L);
             }
@@ -340,29 +331,33 @@ public class ShopChest extends JavaPlugin {
                 UpdateCheckerResult result = uc.check();
 
                 Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_CHECKING));
-                if (result == UpdateCheckerResult.TRUE) {
-                    latestVersion = uc.getVersion();
-                    downloadLink = uc.getLink();
-                    isUpdateNeeded = true;
-                    Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, latestVersion)));
+                switch (result) {
+                    case TRUE:
+                        latestVersion = uc.getVersion();
+                        downloadLink = uc.getLink();
+                        isUpdateNeeded = true;
+                        Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, latestVersion)));
 
-                    for (Player p : getServer().getOnlinePlayers()) {
-                        if (p.hasPermission(Permissions.UPDATE_NOTIFICATION)) {
-                            JsonBuilder jb = new JsonBuilder(ShopChest.this, LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, latestVersion)), LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_CLICK_TO_DOWNLOAD), downloadLink);
-                            jb.sendJson(p);
+                        for (Player p : getServer().getOnlinePlayers()) {
+                            if (p.hasPermission(Permissions.UPDATE_NOTIFICATION)) {
+                                JsonBuilder jb = new JsonBuilder(ShopChest.this, LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, latestVersion)), LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_CLICK_TO_DOWNLOAD), downloadLink);
+                                jb.sendJson(p);
+                            }
                         }
-                    }
 
-                } else if (result == UpdateCheckerResult.FALSE) {
-                    latestVersion = "";
-                    downloadLink = "";
-                    isUpdateNeeded = false;
-                    Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_NO_UPDATE));
-                } else {
-                    latestVersion = "";
-                    downloadLink = "";
-                    isUpdateNeeded = false;
-                    Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_ERROR));
+                        break;
+                    case FALSE:
+                        latestVersion = "";
+                        downloadLink = "";
+                        isUpdateNeeded = false;
+                        Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_NO_UPDATE));
+                        break;
+                    default:
+                        latestVersion = "";
+                        downloadLink = "";
+                        isUpdateNeeded = false;
+                        Bukkit.getConsoleSender().sendMessage("[ShopChest] " + LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_ERROR));
+                        break;
                 }
             }
         }.runTaskAsynchronously(this);

@@ -94,22 +94,25 @@ class ShopCommandExecutor implements CommandExecutor {
                     Player p = (Player) sender;
 
                     if (subCommand.getName().equalsIgnoreCase("create")) {
-                        if (args.length == 4) {
-                            create(args, Shop.ShopType.NORMAL, p);
-                        } else if (args.length == 5) {
-                            if (args[4].equalsIgnoreCase("normal")) {
+                        switch (args.length) {
+                            case 4:
                                 create(args, Shop.ShopType.NORMAL, p);
-                            } else if (args[4].equalsIgnoreCase("admin")) {
-                                if (p.hasPermission(Permissions.CREATE_ADMIN)) {
-                                    create(args, Shop.ShopType.ADMIN, p);
+                                break;
+                            case 5:
+                                if (args[4].equalsIgnoreCase("normal")) {
+                                    create(args, Shop.ShopType.NORMAL, p);
+                                } else if (args[4].equalsIgnoreCase("admin")) {
+                                    if (p.hasPermission(Permissions.CREATE_ADMIN)) {
+                                        create(args, Shop.ShopType.ADMIN, p);
+                                    } else {
+                                        p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.NO_PERMISSION_CREATE_ADMIN));
+                                    }
                                 } else {
-                                    p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.NO_PERMISSION_CREATE_ADMIN));
+                                    return false;
                                 }
-                            } else {
+                                break;
+                            default:
                                 return false;
-                            }
-                        } else {
-                            return false;
                         }
                     } else if (subCommand.getName().equalsIgnoreCase("remove")) {
                         remove(p);
@@ -147,28 +150,32 @@ class ShopCommandExecutor implements CommandExecutor {
         UpdateChecker uc = new UpdateChecker(ShopChest.getInstance());
         UpdateChecker.UpdateCheckerResult result = uc.check();
 
-        if (result == UpdateChecker.UpdateCheckerResult.TRUE) {
-            plugin.setLatestVersion(uc.getVersion());
-            plugin.setDownloadLink(uc.getLink());
-            plugin.setUpdateNeeded(true);
+        switch (result) {
+            case TRUE:
+                plugin.setLatestVersion(uc.getVersion());
+                plugin.setDownloadLink(uc.getLink());
+                plugin.setUpdateNeeded(true);
 
-            if (sender instanceof Player) {
-                JsonBuilder jb = new JsonBuilder(plugin, LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, uc.getVersion())), LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_CLICK_TO_DOWNLOAD), uc.getLink());
-                jb.sendJson((Player) sender);
-            } else {
-                sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, uc.getVersion())));
-            }
+                if (sender instanceof Player) {
+                    JsonBuilder jb = new JsonBuilder(plugin, LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, uc.getVersion())), LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_CLICK_TO_DOWNLOAD), uc.getLink());
+                    jb.sendJson((Player) sender);
+                } else {
+                    sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_AVAILABLE, new LocalizedMessage.ReplacedPlaceholder(Placeholder.VERSION, uc.getVersion())));
+                }
 
-        } else if (result == UpdateChecker.UpdateCheckerResult.FALSE) {
-            plugin.setLatestVersion("");
-            plugin.setDownloadLink("");
-            plugin.setUpdateNeeded(false);
-            sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_NO_UPDATE));
-        } else {
-            plugin.setLatestVersion("");
-            plugin.setDownloadLink("");
-            plugin.setUpdateNeeded(false);
-            sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_ERROR));
+                break;
+            case FALSE:
+                plugin.setLatestVersion("");
+                plugin.setDownloadLink("");
+                plugin.setUpdateNeeded(false);
+                sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_NO_UPDATE));
+                break;
+            default:
+                plugin.setLatestVersion("");
+                plugin.setDownloadLink("");
+                plugin.setUpdateNeeded(false);
+                sender.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.UPDATE_ERROR));
+                break;
         }
     }
 

@@ -314,7 +314,7 @@ public class ShopUtils {
         boolean firstShopInSight = plugin.getShopChestConfig().only_show_first_shop_in_sight;
 
         // used if only_show_first_shop_in_sight
-        List<Shop> otherShopsInSight = firstShopInSight ? new ArrayList<Shop>() : null;
+        List<Shop> otherShopsInSight = firstShopInSight ? new ArrayList<>() : null;
         double nearestDistance = 0;
         Shop nearestShop = null;
 

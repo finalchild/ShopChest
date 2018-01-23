@@ -34,10 +34,7 @@ public class ClickType {
      * @return The Player's click type or <b>null</b> if he doesn't have one
      */
     public static ClickType getPlayerClickType(OfflinePlayer player) {
-        if (playerClickType.containsKey(player))
-            return playerClickType.get(player);
-        else
-            return null;
+        return playerClickType.getOrDefault(player, null);
     }
 
     /**

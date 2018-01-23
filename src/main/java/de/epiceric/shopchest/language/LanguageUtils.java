@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class LanguageUtils {
 
@@ -1109,7 +1110,7 @@ public class LanguageUtils {
                 return ((BookMeta) meta).getTitle();
             } else if (meta instanceof SkullMeta) {
                 if (((SkullMeta) meta).hasOwner()) {
-                    return String.format(langConfig.getString("item.skull.player.name", "%s's Head"), ((SkullMeta) meta).getOwner());
+                    return String.format(langConfig.getString("item.skull.player.name", "%s's Head"), ((SkullMeta) meta).getOwningPlayer().getName());
                 }
             }
         }
@@ -1149,18 +1150,22 @@ public class LanguageUtils {
                     }
                 } else {
                     if (Utils.getMajorVersion() >= 9) {
-                        if (material == Material.LINGERING_POTION) {
-                            if (potionName.getPotionItemType() == PotionName.PotionItemType.LINGERING_POTION && potionName.getPotionType() == potionType) {
-                                return potionName.getLocalizedName() + upgradeString;
-                            }
-                        } else if (material == Material.TIPPED_ARROW) {
-                            if (potionName.getPotionItemType() == PotionName.PotionItemType.TIPPED_ARROW && potionName.getPotionType() == potionType) {
-                                return potionName.getLocalizedName() + upgradeString;
-                            }
-                        } else if (material == Material.SPLASH_POTION) {
-                            if (potionName.getPotionItemType() == PotionName.PotionItemType.SPLASH_POTION && potionName.getPotionType() == potionType) {
-                                return potionName.getLocalizedName() + upgradeString;
-                            }
+                        switch (material) {
+                            case LINGERING_POTION:
+                                if (potionName.getPotionItemType() == PotionName.PotionItemType.LINGERING_POTION && potionName.getPotionType() == potionType) {
+                                    return potionName.getLocalizedName() + upgradeString;
+                                }
+                                break;
+                            case TIPPED_ARROW:
+                                if (potionName.getPotionItemType() == PotionName.PotionItemType.TIPPED_ARROW && potionName.getPotionType() == potionType) {
+                                    return potionName.getLocalizedName() + upgradeString;
+                                }
+                                break;
+                            case SPLASH_POTION:
+                                if (potionName.getPotionItemType() == PotionName.PotionItemType.SPLASH_POTION && potionName.getPotionType() == potionType) {
+                                    return potionName.getLocalizedName() + upgradeString;
+                                }
+                                break;
                         }
                     }
                 }
@@ -1339,21 +1344,14 @@ public class LanguageUtils {
      */
     private static String formatDefaultString(String string) {
         string = string.replace("_", " ");
-        String newString = "";
+        StringJoiner newString = new StringJoiner(" ");
 
-        if (string.contains(" ")) {
-            for (int i = 0; i < string.split(" ").length; i++) {
-                String part = string.split(" ")[i].toLowerCase();
-                part = part.substring(0, 1).toUpperCase() + part.substring(1);
-                newString = newString + part + (i == string.split(" ").length - 1 ? "" : " ");
-            }
-
-            return newString;
-        } else {
-            newString = string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase();
+        String[] split = string.split(" ");
+        for (String s : split) {
+            newString.add(Character.toUpperCase(s.charAt(0)) + s.substring(1).toUpperCase());
         }
 
-        return newString;
+        return newString.toString();
     }
 
 

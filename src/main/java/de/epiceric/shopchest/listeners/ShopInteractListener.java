@@ -35,6 +35,7 @@ import de.epiceric.shopchest.utils.Permissions;
 import de.epiceric.shopchest.utils.ShopUtils;
 import de.epiceric.shopchest.utils.Utils;
 import fr.xephi.authme.AuthMe;
+import fr.xephi.authme.api.v3.AuthMeApi;
 import me.ryanhamshire.GriefPrevention.Claim;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -136,7 +137,7 @@ public class ShopInteractListener implements Listener {
         Player p = e.getPlayer();
         Block b = e.getClickedBlock();
 
-        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMe.getApi().isAuthenticated(p)) return;
+        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMeApi.getInstance().isAuthenticated(p)) return;
 
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST)) {
@@ -468,7 +469,7 @@ public class ShopInteractListener implements Listener {
                                                 if (confirmed || !config.confirm_shopping) {
                                                     buy(p, shop, p.isSneaking());
                                                     if (config.confirm_shopping) {
-                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                         ids.remove(shop.getID());
                                                         if (ids.isEmpty()) needsConfirmation.remove(p.getUniqueId());
                                                         else needsConfirmation.put(p.getUniqueId(), ids);
@@ -476,7 +477,7 @@ public class ShopInteractListener implements Listener {
                                                 } else {
                                                     plugin.debug("Needs confirmation");
                                                     p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.CLICK_TO_CONFIRM));
-                                                    Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                    Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                     ids.add(shop.getID());
                                                     needsConfirmation.put(p.getUniqueId(), ids);
                                                 }
@@ -493,7 +494,7 @@ public class ShopInteractListener implements Listener {
                                                     if (confirmed || !config.confirm_shopping) {
                                                         buy(p, shop, p.isSneaking());
                                                         if (config.confirm_shopping) {
-                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                             ids.remove(shop.getID());
                                                             if (ids.isEmpty()) needsConfirmation.remove(p.getUniqueId());
                                                             else needsConfirmation.put(p.getUniqueId(), ids);
@@ -501,7 +502,7 @@ public class ShopInteractListener implements Listener {
                                                     } else {
                                                         plugin.debug("Needs confirmation");
                                                         p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.CLICK_TO_CONFIRM));
-                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                         ids.add(shop.getID());
                                                         needsConfirmation.put(p.getUniqueId(), ids);
                                                     }
@@ -510,7 +511,7 @@ public class ShopInteractListener implements Listener {
                                                         if (confirmed || !config.confirm_shopping) {
                                                             buy(p, shop, p.isSneaking());
                                                             if (config.confirm_shopping) {
-                                                                Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                                Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                                 ids.remove(shop.getID());
                                                                 if (ids.isEmpty()) needsConfirmation.remove(p.getUniqueId());
                                                                 else needsConfirmation.put(p.getUniqueId(), ids);
@@ -518,7 +519,7 @@ public class ShopInteractListener implements Listener {
                                                         } else {
                                                             plugin.debug("Needs confirmation");
                                                             p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.CLICK_TO_CONFIRM));
-                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                             ids.add(shop.getID());
                                                             needsConfirmation.put(p.getUniqueId(), ids);
                                                         }
@@ -583,7 +584,7 @@ public class ShopInteractListener implements Listener {
                                                 if (confirmed || !config.confirm_shopping) {
                                                     sell(p, shop, stack);
                                                     if (config.confirm_shopping) {
-                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                         ids.remove(shop.getID());
                                                         if (ids.isEmpty()) needsConfirmation.remove(p.getUniqueId());
                                                         else needsConfirmation.put(p.getUniqueId(), ids);
@@ -591,7 +592,7 @@ public class ShopInteractListener implements Listener {
                                                 } else {
                                                     plugin.debug("Needs confirmation");
                                                     p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.CLICK_TO_CONFIRM));
-                                                    Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                    Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                     ids.add(shop.getID());
                                                     needsConfirmation.put(p.getUniqueId(), ids);
                                                 }
@@ -600,7 +601,7 @@ public class ShopInteractListener implements Listener {
                                                     if (confirmed || !config.confirm_shopping) {
                                                         sell(p, shop, stack);
                                                         if (config.confirm_shopping) {
-                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                            Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                             ids.remove(shop.getID());
                                                             if (ids.isEmpty()) needsConfirmation.remove(p.getUniqueId());
                                                             else needsConfirmation.put(p.getUniqueId(), ids);
@@ -608,7 +609,7 @@ public class ShopInteractListener implements Listener {
                                                     } else {
                                                         plugin.debug("Needs confirmation");
                                                         p.sendMessage(LanguageUtils.getMessage(LocalizedMessage.Message.CLICK_TO_CONFIRM));
-                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<Integer>();
+                                                        Set<Integer> ids = needsConfirmation.containsKey(p.getUniqueId()) ? needsConfirmation.get(p.getUniqueId()) : new HashSet<>();
                                                         ids.add(shop.getID());
                                                         needsConfirmation.put(p.getUniqueId(), ids);
                                                     }
@@ -642,7 +643,7 @@ public class ShopInteractListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMe.getApi().isAuthenticated(e.getPlayer())) return;
+        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMeApi.getInstance().isAuthenticated(e.getPlayer())) return;
         handleInteractEvent(e);
     }
 
@@ -652,7 +653,7 @@ public class ShopInteractListener implements Listener {
 
         Entity entity = e.getRightClicked();
         Player p = e.getPlayer();
-        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMe.getApi().isAuthenticated(p)) return;
+        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMeApi.getInstance().isAuthenticated(p)) return;
 
         if (Utils.getMajorVersion() == 8 || e.getHand() == EquipmentSlot.HAND) {
             if (entity instanceof ArmorStand) {
@@ -687,7 +688,7 @@ public class ShopInteractListener implements Listener {
 
         if (!(damager instanceof Player)) return;
         Player p = (Player) damager;
-        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMe.getApi().isAuthenticated(p)) return;
+        if (config.enable_authme_integration && plugin.hasAuthMe() && !AuthMeApi.getInstance().isAuthenticated(p)) return;
 
         if (entity instanceof ArmorStand) {
             ArmorStand armorStand = (ArmorStand) entity;

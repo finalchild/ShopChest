@@ -1,0 +1,85 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
+    id 'java'
+}
+
+group 'de.epiceric'
+version '1.12.4-SNAPSHOT'
+
+defaultTasks 'clean', 'build', 'shadow'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'SpigotMC Repository'
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name 'Herocraft Repository'
+        url 'http://nexus.hc.to/content/repositories/pub_releases/'
+    }
+    maven {
+        name 'bStats Repository'
+        url 'https://repo.bstats.org/content/repositories/releases/'
+    }
+    maven {
+        name 'CodeMC Repository'
+        url 'https://ci.codemc.org/plugin/repository/everything/'
+    }
+    maven {
+        name 'PlotSquared Repository'
+        url 'https://ci.athion.net/job/PlotSquared/ws/mvn/'
+    }
+    maven {
+        name 'uSkyBlock Repository'
+        url 'https://raw.github.com/rlf/uSkyBlock/mvn-repo/'
+    }
+    maven {
+        name 'Tastybento Repository'
+        url 'https://dl.bintray.com/tastybento/maven-repo/'
+    }
+    maven {
+        name 'JitPack'
+        url 'https://jitpack.io/'
+    }
+    maven {
+        name 'sk89q Repository'
+        url 'https://maven.sk89q.com/repo/'
+    }
+    maven {
+        name 'NLthijs48 Repository'
+        url 'http://maven.wiefferink.me/'
+    }
+}
+
+dependencies {
+    compile group: 'org.bukkit', name: 'bukkit', version: '1.12.2-R0.1-SNAPSHOT'
+    compile group: 'net.milkbowl.vault', name: 'VaultAPI', version: '1.6'
+    compile group: 'org.bstats', name: 'bstats-bukkit', version: '1.2'
+    compileOnly group: 'fr.xephi', name: 'authme', version: '5.4.0'
+    compileOnly group: 'com.plotsquared', name: 'plotsquared-api', version: 'latest'
+    compileOnly group: 'com.github.rlf', name: 'uSkyBlock-API', version: '2.6.4'
+    compileOnly group: 'com.wasteofplastic', name: 'askyblock', version: '3.0.8.2'
+    compileOnly group: 'com.github.TechFortress', name: 'GriefPrevention', version: '16.8', {
+        exclude group: 'com.sk89q', module: 'worldguard'
+    }
+    compileOnly files('lib/towny-advanced-0.92.0.0.jar')
+    compileOnly files('lib/island-world-8.0.jar')
+    compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-legacy', version: '6.2'
+    compileOnly group: 'me.wiefferink', name: 'areashop', version: '2.4.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    dependencies {
+        exclude(dependency {
+            it.moduleName != 'bstats-bukkit'
+        })
+    }
+    relocate 'org.bstats.bukkit', 'de.epiceric.shopchest.utils'
+}

@@ -360,12 +360,12 @@ public class Config {
         database_mysql_username = plugin.getConfig().getString("database.mysql.username");
         database_mysql_password = plugin.getConfig().getString("database.mysql.password");
         database_type = Database.DatabaseType.valueOf(plugin.getConfig().getString("database.type"));
-        minimum_prices = (plugin.getConfig().getConfigurationSection("minimum-prices") == null) ? new HashSet<String>() : plugin.getConfig().getConfigurationSection("minimum-prices").getKeys(true);
-        maximum_prices = (plugin.getConfig().getConfigurationSection("maximum-prices") == null) ? new HashSet<String>() : plugin.getConfig().getConfigurationSection("maximum-prices").getKeys(true);
+        minimum_prices = (plugin.getConfig().getConfigurationSection("minimum-prices") == null) ? new HashSet<>() : plugin.getConfig().getConfigurationSection("minimum-prices").getKeys(true);
+        maximum_prices = (plugin.getConfig().getConfigurationSection("maximum-prices") == null) ? new HashSet<>() : plugin.getConfig().getConfigurationSection("maximum-prices").getKeys(true);
         allow_decimals_in_price = plugin.getConfig().getBoolean("allow-decimals-in-price");
         allow_broken_items = plugin.getConfig().getBoolean("allow-broken-items");
         auto_calculate_item_amount = (allow_decimals_in_price && plugin.getConfig().getBoolean("auto-calculate-item-amount"));
-        blacklist = (plugin.getConfig().getStringList("blacklist") == null) ? new ArrayList<String>() : plugin.getConfig().getStringList("blacklist");
+        blacklist = (plugin.getConfig().getStringList("blacklist") == null) ? new ArrayList<>() : plugin.getConfig().getStringList("blacklist");
         buy_greater_or_equal_sell = plugin.getConfig().getBoolean("buy-greater-or-equal-sell");
         hopper_protection = plugin.getConfig().getBoolean("hopper-protection");
         explosion_protection = plugin.getConfig().getBoolean("explosion-protection");

@@ -53,6 +53,6 @@ public class ShopBuySellEvent extends ShopEvent implements Cancellable {
 
     public enum Type {
         BUY,
-        SELL;
+        SELL
     }
 }

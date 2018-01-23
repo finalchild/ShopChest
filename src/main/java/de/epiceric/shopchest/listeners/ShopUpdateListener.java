@@ -50,21 +50,18 @@ public class ShopUpdateListener implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    plugin.getUpdater().beforeNext(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (p.isOnline()) {
-                                for (Shop shop : plugin.getShopUtils().getShops()) {
-                                    if (shop.hasItem()) {
-                                        shop.getItem().hidePlayer(p);
-                                    }
-                                    if (shop.hasHologram()) {
-                                        shop.getHologram().hidePlayer(p);
-                                    }
+                    plugin.getUpdater().beforeNext(() -> {
+                        if (p.isOnline()) {
+                            for (Shop shop : plugin.getShopUtils().getShops()) {
+                                if (shop.hasItem()) {
+                                    shop.getItem().hidePlayer(p);
                                 }
-                                // so next update will update correctly
-                                plugin.getShopUtils().resetPlayerLocation(p);
+                                if (shop.hasHologram()) {
+                                    shop.getHologram().hidePlayer(p);
+                                }
                             }
+                            // so next update will update correctly
+                            plugin.getShopUtils().resetPlayerLocation(p);
                         }
                     });
                 }
